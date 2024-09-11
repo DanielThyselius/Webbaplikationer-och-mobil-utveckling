@@ -1,3 +1,4 @@
+using Demo.Api;
 using DemoModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,9 @@ internal class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        // Add our services to the container.
+        builder.Services.AddSingleton<IBookService, BookService>();
 
         builder.Services.AddCors(options =>
         {
@@ -32,31 +36,53 @@ internal class Program
 
         app.UseHttpsRedirection();
 
-        // This is where the magic happens
-        var books = Book.GetSampleData();
-
-        // Get all books
-        app.MapGet("/books", () => Results.Ok(books));
-        // Get a specific book by id
-        app.MapGet("/books/{id}", (int id) =>
+        // Map endopoints
+        app.MapGet("/books", GetAllBooks);
+        app.MapGet("/books/{id}", GetBookById);
+        app.MapPut("/books/{id}", UpdateBook);
+        app.MapPost("/books", (Book book, IBookService bookService) =>
         {
-            var book = books.FirstOrDefault(b => b.Id == id);
-            if (book is null)
-            {
-                return Results.NotFound();
-            }
-
-            return Results.Ok(book);
-        });
-
-        // Problem med formulär? Lägg till [FromForm] i parametern ex: ([FromForm] Book book)
-        app.MapPost("/books", (Book book) =>
-        {
-            book.Id = books.Max(b => b.Id) + 1;
-            books.Add(book);
+            // TODO: Flytta detta till en egen metod
+            // Problem med formulär? Lägg till [FromForm] i parametern ex: ([FromForm] Book book)
+            bookService.Add(book);
             return Results.Created($"/books/{book.Id}", book);
         });
 
+
         app.Run();
+    }
+
+
+
+    // Handlers
+    private static IResult UpdateBook(int id, Book book, IBookService bookService)
+    {
+        var existingBook = bookService.GetBookById(id);
+
+        if (existingBook is null)
+        {
+            return Results.NotFound();
+        }
+
+        bookService.Update(book);
+        return Results.Ok(book);
+    }
+
+    private static IResult GetBookById(int id, IBookService bookService)
+    {
+
+        var book = bookService.GetBookById(id);
+
+        if (book is null)
+        {
+            return Results.NotFound();
+        }
+
+        return Results.Ok(book);
+    }
+
+    private static IResult GetAllBooks(IBookService bookService)
+    {
+        return Results.Ok(bookService.GetBooks());
     }
 }

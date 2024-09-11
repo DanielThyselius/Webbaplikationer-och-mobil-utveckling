@@ -1,0 +1,6 @@
+@Demo.ControllerApi_HostAddress = http://localhost:5133
+
+GET {{Demo.ControllerApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -8,6 +8,15 @@ public record Book
     public string? Review { get; set; }
     public string? Description { get; set; }
 
+    private int _pages;
+
+    public int Name
+    {
+        get { return _pages; }
+        set { _pages = value; }
+    }
+
+
     public static List<Book> GetSampleData()
     {
         return new List<Book>
