@@ -1,4 +1,5 @@
 using Demo.Api;
+using Demo.Api.Endpoints;
 using DemoModels;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -53,61 +54,12 @@ internal class Program
 
         app.MapGet("/", () => Results.File("./local-test-page.html", "text/html"));
 
-        // Map endopoints
-        app.MapGet("/books", GetAllBooks)
-            .WithSummary("Hämtar alla böcker")
-            .WithDescription("Hämtar alla böcker som sagt...")
-            .WithTags("Böcker")
-            .Produces<Book>(StatusCodes.Status200OK);
-            
-        app.MapGet("/books/{id}", GetBookById);
-        app.MapPut("/books/{id}", UpdateBook);
-        app.MapPost("/books", CreateBook);
-
+        app.MapBookEndpoints();
+        app.MapAuthorEndpoints();
 
         app.Run();
     }
 
 
 
-    // Handlers
-
-    static IResult CreateBook(Book book, IBookService bookService)
-    {
-        // TODO: Flytta detta till en egen metod
-        // Problem med formulär? Lägg till [FromForm] i parametern ex: ([FromForm] Book book)
-        bookService.Add(book);
-        return Results.Created($"/books/{book.Id}", book);
-    }
-
-    static IResult UpdateBook(int id, Book book, IBookService bookService)
-    {
-        var existingBook = bookService.GetBookById(id);
-
-        if (existingBook is null)
-        {
-            return Results.NotFound();
-        }
-
-        bookService.Update(book);
-        return Results.Ok(book);
-    }
-
-    private static IResult GetBookById(int id, IBookService bookService)
-    {
-
-        var book = bookService.GetBookById(id);
-
-        if (book is null)
-        {
-            return Results.NotFound();
-        }
-
-        return Results.Ok(book);
-    }
-
-    private static IResult GetAllBooks(IBookService bookService)
-    {
-        return Results.Ok(bookService.GetBooks());
-    }
 }

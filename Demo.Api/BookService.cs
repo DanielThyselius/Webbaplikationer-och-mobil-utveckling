@@ -9,6 +9,7 @@ namespace Demo.Api
 
         public BookService()
         {
+            //_context = context;
             _books = Book.GetSampleData();
         }
 
@@ -19,6 +20,7 @@ namespace Demo.Api
 
         public Book GetBookById(int id)
         {
+            //return _context.Books.FirstOrDefault(b => b.Id == id);
             return _books.FirstOrDefault(b => b.Id == id);
         }
 
