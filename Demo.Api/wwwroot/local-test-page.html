@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <form action="https://localhost:7270/books" method="post" target="result">
+    <input type="text" name="title" id="new-book-title">
+    <input type="text" name="author" id="new-book-author">
+    <input type="text" name="description" id="new-book-description">
+    <button type="submit">Add book</button>
+  </form>
+  <hr>
+  <iframe name="result"></iframe>
+  <hr>
+  <button onclick="GetBooks()">Get Books</button>
+  <div id="book-list"></div>
+</body>
+
+<script>
+  const GetBooks = async () => {
+    try {
+      // Make an API request
+      let response = await fetch('https://localhost:7270/books');
+      let books = await response.json();
+
+      // Get the div element
+      let container = document.getElementById('book-list');
+
+      // Generate the HTML content based on the retrieved books
+      let htmlContent = generateHtmlContent(books);
+
+      // Update the div with the generated HTML content
+      container.innerHTML = htmlContent;
+      
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Function to generate HTML content based on the books
+  function generateHtmlContent(books) {
+    let html = '';
+
+    // Iterate over the books and generate HTML elements
+    books.forEach(item => {
+      html += `<p>${item.title}</p>`;
+    });
+
+    return html;
+  }
+</script>
+
+</html>

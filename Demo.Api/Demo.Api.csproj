@@ -15,4 +15,8 @@
     <ProjectReference Include="..\DemoModels\DemoModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>
